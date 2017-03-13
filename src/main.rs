@@ -14,19 +14,15 @@ fn main() {
 	use std::net::UdpSocket;
 	use std::str;
 
+	println!("Program Start");
+
 	let mut tables : Vec<String> = Vec::new();
 	let mut deployments : Vec<String> = Vec::new();
 
-	let mut mock_data = vec![Edge {
-		deployment:    0,
-		subject_table: 0,
-		subject_id:    0,
-		object_table:  0,
-		object_id:     0,
-		link_type:     0,
-	} ; 1000000];
+	let mut edges : Vec<Edge> = Vec::new();
 
-	mock_data_setup(&mut mock_data, &mut tables, &mut deployments);
+	mock_data_setup(&mut edges, &mut tables, &mut deployments);
+	get_all_links(&mut edges);
 	let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
 	let mut buf = [0; 100];
 
@@ -87,20 +83,97 @@ impl PartialEq for Edge {
 	// id:          u32,
 // }
 
-fn parse_received(buf: & [u8]) {
+fn parse_received(buf: & [u8]) -> Option<(String, String, u32)> {
 	let mut temp_string = String::from_utf8_lossy(buf);
 	let mut split = temp_string.split(" ");
 	for s in split {
 		println!("{}", s)
 	}
 	
+	None
+}
+
+fn get_all_links( edges: &mut Vec<Edge> ){
+	let search_edge = Edge {
+		deployment:    0,
+		subject_table: 20,
+		subject_id:    10,
+		object_table:  0,
+		object_id:     0,
+		link_type:     0,
+	};
+	let mut search_start : usize = 0;
+	let mut search_end : usize = edges.len();
+	let mut jump_amount : usize = edges.len() / 2;
+	loop {
+		println!("search_start = {}", search_start);
+		if jump_amount == 0 {
+			break;	
+		}
+		match search_edge.cmp(&edges[search_start + jump_amount]) {
+			Ordering::Greater => {
+				search_start += jump_amount;
+			},
+			_ => {
+				
+			},
+		}
+		if jump_amount > 4 {
+			jump_amount += 1;
+		}
+		jump_amount = jump_amount / 2;
+	}
 	
+	jump_amount = (edges.len() - search_start) / 2;
+	loop {
+		println!("search_end = {}", search_end);
+		if jump_amount == 0 {
+			break;	
+		}
+		match search_edge.cmp(&edges[search_end - jump_amount]) {
+			Ordering::Less => {
+				search_end -= jump_amount;
+			},
+			_ => {
+				
+			},
+		}
+		if jump_amount > 4 {
+			jump_amount += 1;
+		}
+		jump_amount = jump_amount / 2;
+	}
+
+	for x in search_start + 1 .. search_end {
+		println!("{}", edges[x].subject_id);
+	}
+
 }
 
 fn mock_data_setup(
-	mock_data: &mut Vec<Edge>, 
+	edges: &mut Vec<Edge>, 
 	tables: &mut Vec<String>,
 	deployments: &mut Vec<String>) {
+	use rand::distributions::{IndependentSample, Range};
+	let mut rng = rand::thread_rng();
+	let object_range = Range::new(0, 500);
+	let table_range = Range::new(0, 200);
+
+	let num_of_edges : usize = 1000000;
+	for e in 0 .. num_of_edges {
+		edges.push( 
+			Edge {
+				deployment:    0,
+				subject_table: table_range.ind_sample(&mut rng),
+				subject_id:    object_range.ind_sample(&mut rng),
+				object_table:  table_range.ind_sample(&mut rng),
+				object_id:     object_range.ind_sample(&mut rng),
+				link_type:     0,
+			} 
+		);
+	}
+
+	edges.sort();
 
 	let num_of_tables : usize = 50;
 	for t in 0 .. num_of_tables {
@@ -115,14 +188,18 @@ fn mock_data_setup(
 	tables[10] = String::from("hiive_hiive");
 
 
-	use rand::Rng;
-	let mut rng = rand::thread_rng();
 
-	for n in 0 .. mock_data.len() {
-		if mock_data[n].subject_table == 1 {
-			println!("{}", mock_data[n].subject_table);
-		}
-	}
+	// for n in 0 .. edges.len() {
+	// 	if edges[n].subject_table == edges[n].object_table && 
+	// 		edges[n].subject_id == edges[n].object_id {
+	// 		println!("self");
+	// 	}
+	// }
+
+
+	// for n in 0 .. 5 {
+	// 	println!("{}", edges[n].subject_id);
+	// }
 
 }
 
