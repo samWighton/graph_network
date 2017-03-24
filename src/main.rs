@@ -5,10 +5,19 @@
 // read in all rows
 // format data ready for response
 // send response
+//
+// benchmark results : 
+// with 100,000 objects in db
+// Sharing 50,000,000 edges
+// 75,709,901 edges traversed per second
+// 0.000006604156 seconds to find the (approx) 250 related objects of a random starting object
+
+// 0.003475303 seconds to traverse 250,000 relationships (with 100,000,000 relationships in db)
 
 extern crate rand;
 
 use std::cmp::Ordering;
+use std::time::Instant;
 
 fn main() {
 	use std::net::UdpSocket;
@@ -22,7 +31,9 @@ fn main() {
 	let mut edges : Vec<Edge> = Vec::new();
 
 	mock_data_setup(&mut edges, &mut tables, &mut deployments);
-	get_all_links(&mut edges);
+
+
+
 	let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
 	let mut buf = [0; 100];
 
@@ -32,6 +43,13 @@ fn main() {
 			.expect("Didn't receive data");
 		parse_received(&buf);
 		println!("number_of_bytes : {}\nsrc_addr : {}", number_of_bytes, src_addr);
+		let first_order_links = get_all_links(&mut edges, (20, 10));
+		let benchmark_start = Instant::now();
+		for f in 0 .. first_order_links.len() {
+			let second_order_links = get_all_links(&mut edges, first_order_links[f]);	
+			// println!("number_of_links : {}", second_order_links.len());
+		}
+		println!("benchmark = {} seconds {} nanoseconds", benchmark_start.elapsed().as_secs(), benchmark_start.elapsed().subsec_nanos());
 	}
 }
 
@@ -93,11 +111,15 @@ fn parse_received(buf: & [u8]) -> Option<(String, String, u32)> {
 	None
 }
 
-fn get_all_links( edges: &mut Vec<Edge> ){
+fn get_all_links( 
+		edges: &mut Vec<Edge>, 
+		(subject_table, subject_id) : (u32, u32) 
+	) -> Vec<(u32, u32)> {
+	
 	let search_edge = Edge {
 		deployment:    0,
-		subject_table: 20,
-		subject_id:    10,
+		subject_table: subject_table,
+		subject_id:    subject_id,
 		object_table:  0,
 		object_id:     0,
 		link_type:     0,
@@ -106,7 +128,7 @@ fn get_all_links( edges: &mut Vec<Edge> ){
 	let mut search_end : usize = edges.len();
 	let mut jump_amount : usize = edges.len() / 2;
 	loop {
-		println!("search_start = {}", search_start);
+		// println!("search_start = {}", search_start);
 		if jump_amount == 0 {
 			break;	
 		}
@@ -126,7 +148,7 @@ fn get_all_links( edges: &mut Vec<Edge> ){
 	
 	jump_amount = (edges.len() - search_start) / 2;
 	loop {
-		println!("search_end = {}", search_end);
+		// println!("search_end = {}", search_end);
 		if jump_amount == 0 {
 			break;	
 		}
@@ -144,10 +166,19 @@ fn get_all_links( edges: &mut Vec<Edge> ){
 		jump_amount = jump_amount / 2;
 	}
 
+	let mut ret_val : Vec<(u32, u32)> = Vec::new();
 	for x in search_start + 1 .. search_end {
-		println!("{}", edges[x].subject_id);
+		ret_val.push(
+			(edges[x].object_table, edges[x].object_id)	
+		);
+		// println!("s id = {}", edges[x].subject_id);
+		// println!("s table = {}", edges[x].subject_table);
+		// println!("o id = {}", edges[x].object_id);
+		// println!("o table = {}", edges[x].object_table);
+		// println!("-------------------------------------");
+		
 	}
-
+	ret_val
 }
 
 fn mock_data_setup(
@@ -156,10 +187,10 @@ fn mock_data_setup(
 	deployments: &mut Vec<String>) {
 	use rand::distributions::{IndependentSample, Range};
 	let mut rng = rand::thread_rng();
-	let object_range = Range::new(0, 500);
-	let table_range = Range::new(0, 200);
+	let object_range = Range::new(0, 100);
+	let table_range = Range::new(0, 2000);
 
-	let num_of_edges : usize = 1000000;
+	let num_of_edges : usize = 10000000;
 	for e in 0 .. num_of_edges {
 		edges.push( 
 			Edge {

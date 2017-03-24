@@ -4,3 +4,9 @@ const client = dgram.createSocket('udp4');
 client.send(message, 34254, 'localhost', (err) => {
 	  client.close();
 });
+
+
+var WebSocketServer = require('websocket').server;
+wsServer = new WebSocketServer({
+	httpServer: server
+});
