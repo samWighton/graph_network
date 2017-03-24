@@ -53,14 +53,66 @@ function set_up_canvas () {
 	edges.push({from : 1, to : 3});
 	edges.push({from : 2, to : 3});
 	draw_edges();
-	
+	draw_vertexes();
 }
 
+function draw_vertexes() {
+	var canvas = document.getElementById('graph_canvas');
+	var ctx = canvas.getContext('2d');
 
+	for (var v = 0; v < vertexes.length; v++) {
+		//draw each vertex
+		draw_vertex(ctx, v);
+	}
+}
+
+function draw_vertex(ctx, v) {
+	var vertex = vertexes[v];
+	//rgba(225,225,225,0.5)
+	var x = vertex.x + global_offset.x;
+	var y = vertex.y + global_offset.y;
+
+	var diamater = 150;
+
+
+    // ctx.fillStyle = 'rgba(0,0,0,0.05)';
+	// ctx.beginPath();
+	// ctx.arc(x+7.5, y+7.5, diamater + 15, 0, Math.PI * 2, true);
+	// ctx.fill();
+	
+	//shadow 1
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+	ctx.beginPath();
+	ctx.arc(x+3, y+3, diamater + 3, 0, Math.PI * 2, true);
+	ctx.fill();
+
+	//shadow 2
+    ctx.fillStyle = 'rgba(0,0,0,0.10)';
+	ctx.beginPath();
+	ctx.arc(x+1.5, y+1.5, diamater + 1.5, 0, Math.PI * 2, true);
+	ctx.fill();
+
+	//fill
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+	ctx.beginPath();
+	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
+	ctx.fill();
+
+	//outline
+	ctx.strokeStyle = 'rgba(30,30,30,1)';	
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
+	ctx.stroke();
+	
+
+	//ctx.stroke();
+}
 
 function draw_edges(){
 	var canvas = document.getElementById('graph_canvas');
 	var ctx = canvas.getContext('2d');
+
 
 	for (var e = 0; e < edges.length; e++) {
 		var start = {
@@ -74,6 +126,25 @@ function draw_edges(){
 	
 		draw_edge(ctx, start, end);
 	}
+}
+
+function draw_edge(ctx, start, end) {
+	
+	ctx.strokeStyle = 'rgba(30,30,30,1)';	
+	ctx.lineWidth = 4;
+
+	start.x += global_offset.x;
+	start.y += global_offset.y;
+	
+	end.x += global_offset.x;
+	end.y += global_offset.y;
+
+	ctx.beginPath();
+	ctx.moveTo(start.x, start.y);
+	//  bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x,   y)
+	ctx.bezierCurveTo((start.x + end.x) / 2, start.y, (start.x + end.x) / 2, end.y, end.x, end.y);
+	ctx.stroke();
+
 }
 
 function get_nearby_vertex(event) {
@@ -129,7 +200,7 @@ function mouse_move(event) {
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	// draw_all(event);
 	draw_edges();
-
+	draw_vertexes();
 }
 
 function mouse_down(event) { 
@@ -165,19 +236,4 @@ function draw_all(event) {
 
 }
 
-function draw_edge(ctx, start, end) {
-	
-	start.x += global_offset.x;
-	start.y += global_offset.y;
-	
-	end.x += global_offset.x;
-	end.y += global_offset.y;
-
-	ctx.beginPath();
-	ctx.moveTo(start.x, start.y);
-	//  bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x,   y)
-	ctx.bezierCurveTo((start.x + end.x) / 2, start.y, (start.x + end.x) / 2, end.y, end.x, end.y);
-	ctx.stroke();
-
-}
 
