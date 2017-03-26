@@ -15,9 +15,6 @@ var mouse_status = {
 
 function main () {
 	set_up_canvas();
-	//draw();
-	// ctx.fillStyle = 'green';
-	// ctx.fillRect(10, 10, 100, 100);
 }
 
 function set_up_canvas () {
@@ -68,28 +65,23 @@ function draw_vertexes() {
 
 function draw_vertex(ctx, v) {
 	var vertex = vertexes[v];
-	//rgba(225,225,225,0.5)
 	var x = vertex.x + global_offset.x;
 	var y = vertex.y + global_offset.y;
 
 	var diamater = 100;
-
-
-    // ctx.fillStyle = 'rgba(0,0,0,0.05)';
-	// ctx.beginPath();
-	// ctx.arc(x+7.5, y+7.5, diamater + 15, 0, Math.PI * 2, true);
-	// ctx.fill();
 	
 	//shadow 1
+	var shadowOffset = 3;
     ctx.fillStyle = 'rgba(0,0,0,0.05)';
 	ctx.beginPath();
-	ctx.arc(x+3, y+3, diamater + 3, 0, Math.PI * 2, true);
+	ctx.arc(x+shadowOffset, y+shadowOffset, diamater + shadowOffset, 0, Math.PI * 2, true);
 	ctx.fill();
 
 	//shadow 2
+	var shadowTwoOffset = shadowOffset / 2;
     ctx.fillStyle = 'rgba(0,0,0,0.10)';
 	ctx.beginPath();
-	ctx.arc(x+1.5, y+1.5, diamater + 1.5, 0, Math.PI * 2, true);
+	ctx.arc(x+shadowTwoOffset, y+shadowTwoOffset, diamater + shadowTwoOffset, 0, Math.PI * 2, true);
 	ctx.fill();
 
 	//fill
@@ -103,10 +95,6 @@ function draw_vertex(ctx, v) {
 	ctx.lineWidth = 1;
 	ctx.beginPath();
 	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
-//	ctx.stroke();
-	
-
-	//ctx.stroke();
 }
 
 function draw_edges(){
@@ -129,14 +117,14 @@ function draw_edges(){
 }
 
 function draw_edge(ctx, start, end) {
-	
+	var vertexOffset = 150;
 	ctx.strokeStyle = 'rgba(30,30,30,1)';	
 	ctx.lineWidth = 4;
 
-	start.x += global_offset.x - 150;
+	start.x += global_offset.x - vertexOffset;
 	start.y += global_offset.y;
 	
-	end.x += global_offset.x + 150;
+	end.x += global_offset.x + vertexOffset;
 	end.y += global_offset.y;
 
 	ctx.beginPath();
@@ -190,7 +178,6 @@ function mouse_move(event) {
 
 	var hover_near = get_nearby_vertex(event).vertex;
 	//TODO animate when near
-	
 
 	var canvas = document.getElementById('graph_canvas');
 
@@ -198,7 +185,6 @@ function mouse_move(event) {
 	var ctx = canvas.getContext('2d');
 	ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	// draw_all(event);
 	draw_edges();
 	draw_vertexes();
 }
@@ -213,27 +199,3 @@ function mouse_up(event) {
 	mouse_status.button_is = 'up';
 	mouse_status.near = undefined;
 }
-
-//deprecated
-function draw_all(event) {
-	var canvas = document.getElementById('graph_canvas');
-	if (!canvas.getContext) {return;}
-	var ctx = canvas.getContext('2d');
-
-	ctx.fillStyle = "white";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-	var start = {}; 
-	var	end = {};
-	start.x = 50;
-	start.y = 50;
-	end.x = event.layerX - global_offset.x;
-	end.y = event.layerY - global_offset.y;
-	draw_edge(ctx, start, end);
-	start.x = 500;
-	start.y = 500;
-	draw_edge(ctx, start, end);
-
-}
-
-
