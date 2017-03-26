@@ -72,7 +72,7 @@ function draw_vertex(ctx, v) {
 	var x = vertex.x + global_offset.x;
 	var y = vertex.y + global_offset.y;
 
-	var diamater = 150;
+	var diamater = 100;
 
 
     // ctx.fillStyle = 'rgba(0,0,0,0.05)';
@@ -103,7 +103,7 @@ function draw_vertex(ctx, v) {
 	ctx.lineWidth = 1;
 	ctx.beginPath();
 	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
-	ctx.stroke();
+//	ctx.stroke();
 	
 
 	//ctx.stroke();
@@ -133,10 +133,10 @@ function draw_edge(ctx, start, end) {
 	ctx.strokeStyle = 'rgba(30,30,30,1)';	
 	ctx.lineWidth = 4;
 
-	start.x += global_offset.x;
+	start.x += global_offset.x - 150;
 	start.y += global_offset.y;
 	
-	end.x += global_offset.x;
+	end.x += global_offset.x + 150;
 	end.y += global_offset.y;
 
 	ctx.beginPath();
