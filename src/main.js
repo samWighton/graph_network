@@ -1,5 +1,6 @@
-var vertexes = [];
-var edges = [];
+var dataContainerRelationships;
+var dataContainerVertexes;
+var vertexes;
 
 var global_offset = {
 	x : 0,
@@ -12,6 +13,16 @@ var mouse_status = {
 	y : 0,
 	near : undefined
 };
+
+// Fake data
+var relationships = [
+	{from : 0, to : 1},
+	{from : 0, to : 2},
+	{from : 1, to : 2},
+	{from : 0, to : 3},
+	{from : 1, to : 3},
+	{from : 2, to : 3},
+];
 
 function main () {
 	set_up_canvas();
@@ -27,7 +38,6 @@ function set_up_canvas () {
 
 	var ctx = canvas.getContext('2d');
 
-
 	ctx.imageSmoothingEnabled = this.checked;
 	ctx.mozImageSmoothingEnabled = this.checked;
 	ctx.webkitImageSmoothingEnabled = this.checked;
@@ -39,16 +49,27 @@ function set_up_canvas () {
 	canvas.addEventListener('mousemove', mouse_move);
 	canvas.addEventListener('mousedown', mouse_down);
 	canvas.addEventListener('mouseup', mouse_up);
-	vertexes.push({x : 100, y : 100});
-	vertexes.push({x : 100, y : 200});
-	vertexes.push({x : 200, y : 200});
-	vertexes.push({x : 100, y : 200});
-	edges.push({from : 0, to : 1});
-	edges.push({from : 0, to : 2});
-	edges.push({from : 1, to : 2});
-	edges.push({from : 0, to : 3});
-	edges.push({from : 1, to : 3});
-	edges.push({from : 2, to : 3});
+
+	vertexes = get_unique_ids(relationships).map((id) => ({x: 300, y: 300, id}));
+
+	// Create an in memory only element to use as data model for d3 compatibility
+	var detachedNodeRelationships = document.createElement('relationships');
+	var detachedNodeVertexes = document.createElement('vertexes');
+	// Create a d3 selected of detachedNode, we wont add this to the DOM
+	dataContainerRelationships = d3.select(detachedNodeRelationships);
+	dataContainerVertexes = d3.select(detachedNodeVertexes);
+
+	// Relationships
+	var dataBinding = dataContainerRelationships.selectAll('relationship').data(relationships, function(d) {return d;});
+
+	dataBinding.enter()
+		.append('relationship');
+
+	var dataBindingVertexes = dataContainerVertexes.selectAll('vertex').data(vertexes, (d) => d);
+	dataBindingVertexes.enter()
+		.append('vertex')
+		.attr('id', (vertex) => vertex.id);
+
 	draw_edges();
 	draw_vertexes();
 }
@@ -57,14 +78,13 @@ function draw_vertexes() {
 	var canvas = document.getElementById('graph_canvas');
 	var ctx = canvas.getContext('2d');
 
-	for (var v = 0; v < vertexes.length; v++) {
-		//draw each vertex
-		draw_vertex(ctx, v);
-	}
+	var vertexes = dataContainerVertexes.selectAll('vertexes vertex');
+	vertexes.each((vertex) => {
+		draw_vertex(ctx, vertex);
+	});
 }
 
-function draw_vertex(ctx, v) {
-	var vertex = vertexes[v];
+function draw_vertex(ctx, vertex) {
 	var x = vertex.x + global_offset.x;
 	var y = vertex.y + global_offset.y;
 
@@ -101,19 +121,19 @@ function draw_edges(){
 	var canvas = document.getElementById('graph_canvas');
 	var ctx = canvas.getContext('2d');
 
-
-	for (var e = 0; e < edges.length; e++) {
+	var relationships = dataContainerRelationships.selectAll('relationships relationship');
+	relationships.each(function(relationship) {
 		var start = {
-			x : vertexes[edges[e].from].x,
-			y : vertexes[edges[e].from].y,
+			x : vertexes[relationship.from].x,
+			y : vertexes[relationship.from].y,
 		}
 		var end = {
-			x : vertexes[edges[e].to].x,
-			y : vertexes[edges[e].to].y,
+			x : vertexes[relationship.to].x,
+			y : vertexes[relationship.to].y,
 		}
-	
+
 		draw_edge(ctx, start, end);
-	}
+	});
 }
 
 function draw_edge(ctx, start, end) {
@@ -145,14 +165,15 @@ function get_nearby_vertex(event) {
 		vertex : undefined,
 		distance : 80
 	};
-	for (var v = 0; v < vertexes.length; v++) {
-		vertex = vertexes[v];
+
+	var vertexesSelection = dataContainerVertexes.selectAll('vertexes vertex');
+	vertexesSelection.each((vertex, index) => {
 		var dist = Math.pow(Math.pow(mouse.x - vertex.x, 2) + Math.pow(mouse.y - vertex.y, 2), 0.5);
 		if (dist < result.distance) {
 			result.distance = dist;
-			result.vertex = v;
+			result.vertex = index;
 		}
-	}	
+	});
 	return (result);
 }
 
@@ -198,4 +219,13 @@ function mouse_down(event) {
 function mouse_up(event) { 
 	mouse_status.button_is = 'up';
 	mouse_status.near = undefined;
+}
+
+function get_unique_ids(relationships) {
+	var allIds = relationships.map((relationship) => relationship.to )
+		.concat( relationships.map(relationship => relationship.from) );
+
+	return allIds.filter( (value, index, self) => {
+		return self.indexOf(value) === index;
+	});
 }
