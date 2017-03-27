@@ -46,9 +46,9 @@ wss.on('connection', function (ws) {
 	console.log('connection from client');
 	const data = JSON.parse(fs.readFileSync('resources/objects.json', 'utf8'));
 	Object.keys(data).forEach((table) => {
-		let objectTable = data[table];
-		Object.keys(objectTable).forEach((objectID) => {
-			let object = objectTable[objectID];
+		const objectsForTable = data[table];
+		Object.keys(objectsForTable).forEach((objectID) => {
+			let object = objectsForTable[objectID];
 			if (object.email) {
 				object.md5 = md5(object.email);
 			}
