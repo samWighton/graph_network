@@ -1,5 +1,3 @@
-var dataContainerRelationships;
-var dataContainerVertexes;
 var vertexes = {};
 
 var global_offset = {
@@ -65,8 +63,6 @@ var edges = [
   }
 ];
 
-var objectMetaData;
-
 var _svgAliases = {
 	staff: 'users2',
 	prospect: 'funnel',
@@ -74,6 +70,15 @@ var _svgAliases = {
 	issue: 'tags',
 	contract: 'retainers-custom',
 };
+
+// Create an in memory only element to use as data model for d3 compatibility
+var detachedNodeRelationships = document.createElement('relationships');
+var detachedNodeVertexes = document.createElement('vertexes');
+// Create a d3 selected of detachedNode, we wont add this to the DOM
+var dataContainerRelationships = d3.select(detachedNodeRelationships);
+var dataContainerVertexes = d3.select(detachedNodeVertexes);
+
+var objectMetaData;
 
 function main () {
 	const socket = new WebSocket('ws://localhost:3000');
@@ -101,20 +106,19 @@ function set_up_canvas () {
 	ctx.webkitImageSmoothingEnabled = this.checked;
 	ctx.msImageSmoothingEnabled = this.checked;
 
-	ctx.fillStyle = "white";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 	canvas.addEventListener('mousemove', mouse_move);
 	canvas.addEventListener('mousedown', mouse_down);
 	canvas.addEventListener('mouseup', mouse_up);
 
+	update();
+}
 
-	// Create an in memory only element to use as data model for d3 compatibility
-	var detachedNodeRelationships = document.createElement('relationships');
-	var detachedNodeVertexes = document.createElement('vertexes');
-	// Create a d3 selected of detachedNode, we wont add this to the DOM
-	dataContainerRelationships = d3.select(detachedNodeRelationships);
-	dataContainerVertexes = d3.select(detachedNodeVertexes);
+function update() {
+	var canvas = document.getElementById('graph_canvas');
+	var ctx = canvas.getContext('2d');
+	
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	// Relationships
 	var toFrom = edges.map( (edge) => ({
@@ -123,7 +127,7 @@ function set_up_canvas () {
 	}));
 	var dataBinding = dataContainerRelationships.selectAll('relationship').data(toFrom);
 
-	var vertexArray = get_unique_ids(toFrom).map((id) => ({x: get_random_value(intViewportWidth), y: get_random_value(intViewportHeight), id}));
+	var vertexArray = get_unique_ids(toFrom).map((id) => ({x: get_random_value(window.innerWidth), y: get_random_value(window.innerHeight), id}));
 
 	vertexArray.forEach( (objectData) => {
 		vertexes[objectData.id] = objectData;
@@ -182,7 +186,7 @@ function draw_vertex(ctx, vertex) {
 
 	//Inner text
 	ctx.fillStyle = "black";
-	ctx.font="16px Georgia";
+	ctx.font="16px Arial";
 	ctx.fillText(vertexMetaData.title || vertexMetaData.name, x + metaDataDisplayOffset, y);
 
 	// Image
