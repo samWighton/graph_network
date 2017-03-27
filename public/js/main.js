@@ -46,11 +46,9 @@ var objectMetaData;
 function main () {
 	const socket = new WebSocket('ws://localhost:3000');
 	socket.onmessage = function(event) {
-		console.log('received');
 		const data = JSON.parse(event.data);
 		if (data.init_data) {
 			objectMetaData = data.init_data;
-			console.log(objectMetaData);
 		}
 		set_up_canvas();
 	}
@@ -143,18 +141,19 @@ function draw_vertex(ctx, vertex) {
 	ctx.arc(x + strokeSize, y + strokeSize, diamater, 0, Math.PI * 2, true);
 	ctx.fill();
 
+	var metaDataDisplayOffset = 30;
 	var vertexMetaData = get_vertex_metadata(vertex.id);
 
 	//Inner text
-	ctx.fillStyle = "red";
-	ctx.font="20px Georgia";
-	ctx.fillText(vertexMetaData.title || vertexMetaData.name, x, y);
+	ctx.fillStyle = "black";
+	ctx.font="16px Georgia";
+	ctx.fillText(vertexMetaData.title || vertexMetaData.name, x + metaDataDisplayOffset, y);
 
 	// Image
 	var myImage = new Image(100, 200);
 	myImage.src = 'https://www.gravatar.com/avatar/' + vertexMetaData.md5 + '?d=blank';
 
-	ctx.drawImage(myImage, x, y);
+	ctx.drawImage(myImage, x + metaDataDisplayOffset, y + 10);
 
 	function get_vertex_metadata(vertexId) {
 		var splitId = vertexId.split('_');
@@ -170,7 +169,6 @@ function draw_edges(){
 
 	var relationships = dataContainerRelationships.selectAll('relationships relationship');
 	relationships.each(function(relationship) {
-		console.log(vertexes);
 		var start = {
 			x : vertexes[relationship.from].x,
 			y : vertexes[relationship.from].y,
@@ -186,7 +184,7 @@ function draw_edges(){
 
 function draw_edge(ctx, start, end) {
 	var vertexOffset = 0;
-	ctx.strokeStyle = 'rgba(30,30,30,1)';	
+	ctx.strokeStyle = 'rgba(30,30,30,0.4)';	
 	ctx.lineWidth = 4;
 
 	start.x += global_offset.x - vertexOffset;
