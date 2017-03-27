@@ -50,7 +50,7 @@ function set_up_canvas () {
 	canvas.addEventListener('mousedown', mouse_down);
 	canvas.addEventListener('mouseup', mouse_up);
 
-	vertexes = get_unique_ids(relationships).map((id) => ({x: 300, y: 300, id}));
+	vertexes = get_unique_ids(relationships).map((id) => ({x: get_random_value(intViewportWidth), y: get_random_value(intViewportHeight), id}));
 
 	// Create an in memory only element to use as data model for d3 compatibility
 	var detachedNodeRelationships = document.createElement('relationships');
@@ -88,7 +88,7 @@ function draw_vertex(ctx, vertex) {
 	var x = vertex.x + global_offset.x;
 	var y = vertex.y + global_offset.y;
 
-	var diamater = 100;
+	var diamater = 50;
 	
 	//shadow 1
 	var shadowOffset = 3;
@@ -115,6 +115,11 @@ function draw_vertex(ctx, vertex) {
 	ctx.lineWidth = 1;
 	ctx.beginPath();
 	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
+
+	//Inner text
+	ctx.fillStyle = "red";
+	ctx.font="20px Georgia";
+	ctx.fillText(vertex.id, x, y);
 }
 
 function draw_edges(){
@@ -137,7 +142,7 @@ function draw_edges(){
 }
 
 function draw_edge(ctx, start, end) {
-	var vertexOffset = 150;
+	var vertexOffset = 75;
 	ctx.strokeStyle = 'rgba(30,30,30,1)';	
 	ctx.lineWidth = 4;
 
@@ -228,4 +233,8 @@ function get_unique_ids(relationships) {
 	return allIds.filter( (value, index, self) => {
 		return self.indexOf(value) === index;
 	});
+}
+
+function get_random_value(max) {
+	return Math.random() * max;
 }
