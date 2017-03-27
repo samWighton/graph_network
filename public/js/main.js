@@ -43,6 +43,79 @@ var edges = [
 
 var objectMetaData;
 
+var _svgAliases = {
+	// Modules
+	company: 'clients-custom',
+	affiliation: 'users2',
+	contact: 'users2',
+	staff: 'users2',
+	campaign: 'campaign-custom',
+	prospect: 'funnel',
+	job: 'projects-custom',
+	job_signoff: 'register',
+	milestone: 'milestone-custom',
+	issue: 'tags',
+	contract: 'retainers-custom',
+	contract_period: 'retainer-period-custom',
+	account_invoice: 'invoices-custom',
+	expense: 'receipt',
+	asset: 'cube',
+	report: 'document2',
+	deployment: 'planet',
+	task: 'clipboard-empty',
+	quote: 'quotes-custom',
+	activity: 'activities-custom',
+	request: 'requests-custom',
+	site: 'sites',
+	note: 'note',
+	email: 'envelope-centered',
+	meeting: 'group-work',
+	call: 'telephone',
+	postal: 'envelope-open',
+	sms: 'bubbles',
+	twitter: 'twitter',
+	comment: 'bubble-text',
+	event_log: 'calendar-full',
+	time_external: 'calendar-insert',
+	campaign_action: 'campaign-custom',
+	material: 'bag2',
+	materials: 'bag2',
+	schedule: 'calendar-empty',
+
+	// Misc
+	plus: 'linear-plus',
+	circled_plus: 'plus-circle',
+	prohibited: 'prohibited',
+	edit: 'pencil',
+	delete: 'trash',
+	save: 'save',
+	location: 'map-marker',
+	star: 'star',
+	star_filled: 'star-filled',
+	play: 'play-fill',
+	pause: 'pause-fill',
+	clock: 'clock3',
+	timer: 'timer',
+	compose: 'compose',
+	logtime: 'log-time',
+	search: 'magnifier',
+	refresh: 'sync',
+	view: 'magnifier',
+	tick: 'check-bold',
+	cross: 'close-bold',
+	split_task: 'split-task-16px',
+	disable: 'cross',
+	preview: 'magnifier',
+	attachment: 'paperclip',
+	reimbursable: 'email-receipt',
+	// TODO job-upgrade - update non billable with icon found in design, waiting on jack for this one
+	non_billable: 'cross',
+	assigned_to_budget: 'wallet',
+	billing_needed: 'warning',
+	fixed_budget: 'lock',
+	calculated_budget: 'calculator2',
+};
+
 function main () {
 	const socket = new WebSocket('ws://localhost:3000');
 	socket.onmessage = function(event) {
@@ -141,8 +214,12 @@ function draw_vertex(ctx, vertex) {
 	ctx.arc(x + strokeSize, y + strokeSize, diamater, 0, Math.PI * 2, true);
 	ctx.fill();
 
+	var splitId = vertex.id.split('_');
+	var type = splitId[0];
+	var id = splitId[1];
+
 	var metaDataDisplayOffset = 30;
-	var vertexMetaData = get_vertex_metadata(vertex.id);
+	var vertexMetaData = objectMetaData[type][id];
 
 	//Inner text
 	ctx.fillStyle = "black";
@@ -151,16 +228,16 @@ function draw_vertex(ctx, vertex) {
 
 	// Image
 	var myImage = new Image(100, 200);
-	myImage.src = 'https://www.gravatar.com/avatar/' + vertexMetaData.md5 + '?d=blank';
+	myImage.src = (function() {
+		if (vertexMetaData.md5) {
+			return 'https://www.gravatar.com/avatar/' + vertexMetaData.md5 + '?d=blank';
+		} else {
+			var alias = _svgAliases[type];
+			return '/single-original-svgs/' + alias + '.svg';
+		}
+	})();
 
 	ctx.drawImage(myImage, x + metaDataDisplayOffset, y + 10);
-
-	function get_vertex_metadata(vertexId) {
-		var splitId = vertexId.split('_');
-		var type = splitId[0];
-		var id = splitId[1];
-		return objectMetaData[type][id];
-	}
 }
 
 function draw_edges(){
