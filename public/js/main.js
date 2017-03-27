@@ -19,24 +19,24 @@ var edges = [
       "deployment":0,
       "subject_table":"staff",
       "subject_id":1000,
-      "object_table":"issue",
-      "object_id":16,
+      "object_table":"job",
+      "object_id":2127,
       "link_type":"manages"
    },
    {  
       "deployment":0,
       "subject_table":"staff",
       "subject_id":1000,
-      "object_table":"issue",
-      "object_id":57,
+      "object_table":"contract",
+      "object_id":6,
       "link_type":"manages"
    },
    {  
       "deployment":0,
       "subject_table":"staff",
       "subject_id":1000,
-      "object_table":"issue",
-      "object_id":4,
+      "object_table":"prospect",
+      "object_id":4196,
       "link_type":"manages"
    }
 ];
@@ -44,14 +44,15 @@ var edges = [
 var objectMetaData;
 
 function main () {
-	set_up_canvas();
 	const socket = new WebSocket('ws://localhost:3000');
 	socket.onmessage = function(event) {
 		console.log('received');
 		const data = JSON.parse(event.data);
 		if (data.init_data) {
 			objectMetaData = data.init_data;
+			console.log(objectMetaData);
 		}
+		set_up_canvas();
 	}
 }
 
@@ -155,7 +156,15 @@ function draw_vertex(ctx, vertex) {
 	//Inner text
 	ctx.fillStyle = "red";
 	ctx.font="20px Georgia";
-	ctx.fillText(vertex.id, x, y);
+	ctx.fillText(get_vertex_title(vertex.id), x, y);
+
+	function get_vertex_title(vertexId) {
+		var splitId = vertexId.split('_');
+		var type = splitId[0];
+		var id = splitId[1];
+		var metaDataForId = objectMetaData[type][id];
+		return metaDataForId.title || metaDataForId.name;
+	}
 }
 
 function draw_edges(){
@@ -216,7 +225,6 @@ function get_nearby_vertex(event) {
 			result.vertex = vertex.id;
 		}
 	});
-	debugger;
 	return (result);
 }
 
