@@ -14,8 +14,10 @@ socket.on('listening', function () {
 });
 
 socket.on('message', function (message, remote) {
+	console.log(remote.address + ':' + remote.port +' - ' + message);
 	allSockets.forEach(function(socket){
-		socket.send(JSON.stringify({new_data : message}));
+		console.log('sending to ' + socket);
+		socket.send(JSON.stringify({new_data : JSON.parse(message, 'utf8')}));
 	});
 });
 
@@ -55,6 +57,7 @@ wss.on('connection', function (ws) {
 		});
 	});
 	ws.send(JSON.stringify({ init_data: data }));
+	send_request('get_all_edges staff 1000');
 });
 
 server.on('request', app);
