@@ -19,6 +19,7 @@
   "homepage": "https://github.com/samWighton/graph_network#readme",
   "dependencies": {
     "express": "^4.15.2",
-	"ws": "^2.2.2"
+    "md5": "^2.2.1",
+    "ws": "^2.2.2"
   }
 }

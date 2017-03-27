@@ -36,6 +36,7 @@ const WebSocketServer = require('ws').Server;
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const md5 = require('md5');
 var server = require('http').createServer();
 app.use(express.static('public'));
 
@@ -44,6 +45,15 @@ wss.on('connection', function (ws) {
 	allSockets.push(ws);
 	console.log('connection from client');
 	const data = JSON.parse(fs.readFileSync('resources/objects.json', 'utf8'));
+	Object.keys(data).forEach((table) => {
+		let objectTable = data[table];
+		Object.keys(objectTable).forEach((objectID) => {
+			let object = objectTable[objectID];
+			if (object.email) {
+				object.md5 = md5(object.email);
+			}
+		});
+	});
 	ws.send(JSON.stringify({ init_data: data }));
 });
 
