@@ -125,45 +125,42 @@ function draw_vertex(ctx, vertex) {
 	var x = vertex.x + global_offset.x;
 	var y = vertex.y + global_offset.y;
 
-	var diamater = 50;
+	var diamater = 15;
+	var strokeSize = 10;
 	
 	//shadow 1
-	var shadowOffset = 3;
-    ctx.fillStyle = 'rgba(0,0,0,0.05)';
-	ctx.beginPath();
-	ctx.arc(x+shadowOffset, y+shadowOffset, diamater + shadowOffset, 0, Math.PI * 2, true);
-	ctx.fill();
+	var strokeSize = 3;
 
-	//shadow 2
-	var shadowTwoOffset = shadowOffset / 2;
-    ctx.fillStyle = 'rgba(0,0,0,0.10)';
+	//stroke
+    ctx.fillStyle = 'rgb(51,153,255)';
 	ctx.beginPath();
-	ctx.arc(x+shadowTwoOffset, y+shadowTwoOffset, diamater + shadowTwoOffset, 0, Math.PI * 2, true);
+	ctx.arc(x+strokeSize, y+strokeSize, diamater + strokeSize, 0, Math.PI * 2, true);
 	ctx.fill();
 
 	//fill
     ctx.fillStyle = 'rgba(255,255,255,1)';
 	ctx.beginPath();
-	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
+	ctx.arc(x + strokeSize, y + strokeSize, diamater, 0, Math.PI * 2, true);
 	ctx.fill();
 
-	//outline
-	ctx.strokeStyle = 'rgba(30,30,30,1)';	
-	ctx.lineWidth = 1;
-	ctx.beginPath();
-	ctx.arc(x, y, diamater, 0, Math.PI * 2, true);
+	var vertexMetaData = get_vertex_metadata(vertex.id);
 
 	//Inner text
 	ctx.fillStyle = "red";
 	ctx.font="20px Georgia";
-	ctx.fillText(get_vertex_title(vertex.id), x, y);
+	ctx.fillText(vertexMetaData.title || vertexMetaData.name, x, y);
 
-	function get_vertex_title(vertexId) {
+	// Image
+	var myImage = new Image(100, 200);
+	myImage.src = 'https://www.gravatar.com/avatar/' + vertexMetaData.md5 + '?d=blank';
+
+	ctx.drawImage(myImage, x, y);
+
+	function get_vertex_metadata(vertexId) {
 		var splitId = vertexId.split('_');
 		var type = splitId[0];
 		var id = splitId[1];
-		var metaDataForId = objectMetaData[type][id];
-		return metaDataForId.title || metaDataForId.name;
+		return objectMetaData[type][id];
 	}
 }
 
@@ -188,7 +185,7 @@ function draw_edges(){
 }
 
 function draw_edge(ctx, start, end) {
-	var vertexOffset = 75;
+	var vertexOffset = 0;
 	ctx.strokeStyle = 'rgba(30,30,30,1)';	
 	ctx.lineWidth = 4;
 
