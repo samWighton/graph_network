@@ -147,9 +147,6 @@ function set_up_canvas () {
 	ctx.webkitImageSmoothingEnabled = this.checked;
 	ctx.msImageSmoothingEnabled = this.checked;
 
-	ctx.fillStyle = "white";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 	canvas.addEventListener('mousemove', mouse_move);
 	canvas.addEventListener('mousedown', mouse_down);
 	canvas.addEventListener('mouseup', mouse_up);
@@ -158,6 +155,12 @@ function set_up_canvas () {
 }
 
 function update() {
+	var canvas = document.getElementById('graph_canvas');
+	var ctx = canvas.getContext('2d');
+	
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 	// Relationships
 	var toFrom = edges.map( (edge) => ({
 		to: edge.subject_table + '_' + edge.subject_id,
