@@ -26,6 +26,14 @@ var relationships = [
 
 function main () {
 	set_up_canvas();
+	const socket = new WebSocket('ws://localhost:3000');
+	socket.onmessage = function(event) {
+		console.log('received');
+		const data = JSON.parse(event.data);
+		if (data.init_data) {
+			console.log(data.init_data);
+		}
+	}
 }
 
 function set_up_canvas () {

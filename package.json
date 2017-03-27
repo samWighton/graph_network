@@ -1,0 +1,24 @@
+{
+  "name": "graph_network",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/node_server.js",
+  "scripts": {
+    "start": "node src/node_server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samWighton/graph_network.git"
+  },
+  "author": "Matt Shirlaw <matt.shirlaw@gmail.com> (https://github.com/mshirlaw/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samWighton/graph_network/issues"
+  },
+  "homepage": "https://github.com/samWighton/graph_network#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+	"ws": "^2.2.2"
+  }
+}
