@@ -44,6 +44,8 @@ fn main() {
 		//TODO send back the data
 		parse_received(&edges, &buf);
 
+        socket.send_to(&buf, &src_addr);
+
 
 
 
@@ -56,6 +58,7 @@ fn main() {
 		// }
 		// println!("benchmark = {} seconds {} nanoseconds", benchmark_start.elapsed().as_secs(), benchmark_start.elapsed().subsec_nanos());
 	}
+	return
 }
 
 #[derive(Debug, Copy, Clone, Eq)]
