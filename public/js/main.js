@@ -223,7 +223,7 @@ function draw_vertex(ctx, vertex) {
 
 	//Inner text
 	ctx.fillStyle = "black";
-	ctx.font="16px Georgia";
+	ctx.font="16px Arial";
 	ctx.fillText(vertexMetaData.title || vertexMetaData.name, x + metaDataDisplayOffset, y);
 
 	// Image
