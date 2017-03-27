@@ -136,10 +136,14 @@ function update() {
 	dataBinding.enter()
 		.append('relationship');
 
+	dataBinding.exit();
+
 	var dataBindingVertexes = dataContainerVertexes.selectAll('vertex').data(vertexArray, (d) => d);
 	dataBindingVertexes.enter()
 		.append('vertex')
 		.attr('id', (vertex) => vertex.id);
+
+	dataBindingVertexes.exit();
 
 	draw_edges();
 	draw_vertexes();
