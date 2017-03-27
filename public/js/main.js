@@ -1,6 +1,6 @@
 var dataContainerRelationships;
 var dataContainerVertexes;
-var vertexes;
+var vertexes = {};
 
 var global_offset = {
 	x : 0,
@@ -14,15 +14,34 @@ var mouse_status = {
 	near : undefined
 };
 
-// Fake data
-var relationships = [
-	{from : 0, to : 1},
-	{from : 0, to : 2},
-	{from : 1, to : 2},
-	{from : 0, to : 3},
-	{from : 1, to : 3},
-	{from : 2, to : 3},
+var edges = [  
+   {  
+      "deployment":0,
+      "subject_table":"staff",
+      "subject_id":1000,
+      "object_table":"issue",
+      "object_id":16,
+      "link_type":"manages"
+   },
+   {  
+      "deployment":0,
+      "subject_table":"staff",
+      "subject_id":1000,
+      "object_table":"issue",
+      "object_id":57,
+      "link_type":"manages"
+   },
+   {  
+      "deployment":0,
+      "subject_table":"staff",
+      "subject_id":1000,
+      "object_table":"issue",
+      "object_id":4,
+      "link_type":"manages"
+   }
 ];
+
+var objectMetaData;
 
 function main () {
 	set_up_canvas();
@@ -31,7 +50,7 @@ function main () {
 		console.log('received');
 		const data = JSON.parse(event.data);
 		if (data.init_data) {
-			console.log(data.init_data);
+			objectMetaData = data.init_data;
 		}
 	}
 }
@@ -58,7 +77,6 @@ function set_up_canvas () {
 	canvas.addEventListener('mousedown', mouse_down);
 	canvas.addEventListener('mouseup', mouse_up);
 
-	vertexes = get_unique_ids(relationships).map((id) => ({x: get_random_value(intViewportWidth), y: get_random_value(intViewportHeight), id}));
 
 	// Create an in memory only element to use as data model for d3 compatibility
 	var detachedNodeRelationships = document.createElement('relationships');
@@ -68,12 +86,22 @@ function set_up_canvas () {
 	dataContainerVertexes = d3.select(detachedNodeVertexes);
 
 	// Relationships
-	var dataBinding = dataContainerRelationships.selectAll('relationship').data(relationships, function(d) {return d;});
+	var toFrom = edges.map( (edge) => ({
+		to: edge.subject_table + '_' + edge.subject_id,
+		from: edge.object_table + '_' + edge.object_id
+	}));
+	var dataBinding = dataContainerRelationships.selectAll('relationship').data(toFrom);
+
+	var vertexArray = get_unique_ids(toFrom).map((id) => ({x: get_random_value(intViewportWidth), y: get_random_value(intViewportHeight), id}));
+
+	vertexArray.forEach( (objectData) => {
+		vertexes[objectData.id] = objectData;
+	});
 
 	dataBinding.enter()
 		.append('relationship');
 
-	var dataBindingVertexes = dataContainerVertexes.selectAll('vertex').data(vertexes, (d) => d);
+	var dataBindingVertexes = dataContainerVertexes.selectAll('vertex').data(vertexArray, (d) => d);
 	dataBindingVertexes.enter()
 		.append('vertex')
 		.attr('id', (vertex) => vertex.id);
@@ -136,6 +164,7 @@ function draw_edges(){
 
 	var relationships = dataContainerRelationships.selectAll('relationships relationship');
 	relationships.each(function(relationship) {
+		console.log(vertexes);
 		var start = {
 			x : vertexes[relationship.from].x,
 			y : vertexes[relationship.from].y,
@@ -184,9 +213,10 @@ function get_nearby_vertex(event) {
 		var dist = Math.pow(Math.pow(mouse.x - vertex.x, 2) + Math.pow(mouse.y - vertex.y, 2), 0.5);
 		if (dist < result.distance) {
 			result.distance = dist;
-			result.vertex = index;
+			result.vertex = vertex.id;
 		}
 	});
+	debugger;
 	return (result);
 }
 
