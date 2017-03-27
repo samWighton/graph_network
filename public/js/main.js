@@ -38,82 +38,41 @@ var edges = [
       "object_table":"prospect",
       "object_id":4196,
       "link_type":"manages"
-   }
+  },
+  {  
+	 "deployment":0,
+	 "subject_table":"staff",
+	 "subject_id":1000,
+	 "object_table":"prospect",
+	 "object_id":4908,
+	 "link_type":"manages"
+ },
+  {  
+	 "deployment":0,
+	 "subject_table":"staff",
+	 "subject_id":1000,
+	 "object_table":"prospect",
+	 "object_id":4208,
+	 "link_type":"manages"
+ },
+  {  
+	 "deployment":0,
+	 "subject_table":"staff",
+	 "subject_id":1000,
+	 "object_table":"contract",
+	 "object_id":29,
+	 "link_type":"manages"
+  }
 ];
 
 var objectMetaData;
 
 var _svgAliases = {
-	// Modules
-	company: 'clients-custom',
-	affiliation: 'users2',
-	contact: 'users2',
 	staff: 'users2',
-	campaign: 'campaign-custom',
 	prospect: 'funnel',
 	job: 'projects-custom',
-	job_signoff: 'register',
-	milestone: 'milestone-custom',
 	issue: 'tags',
 	contract: 'retainers-custom',
-	contract_period: 'retainer-period-custom',
-	account_invoice: 'invoices-custom',
-	expense: 'receipt',
-	asset: 'cube',
-	report: 'document2',
-	deployment: 'planet',
-	task: 'clipboard-empty',
-	quote: 'quotes-custom',
-	activity: 'activities-custom',
-	request: 'requests-custom',
-	site: 'sites',
-	note: 'note',
-	email: 'envelope-centered',
-	meeting: 'group-work',
-	call: 'telephone',
-	postal: 'envelope-open',
-	sms: 'bubbles',
-	twitter: 'twitter',
-	comment: 'bubble-text',
-	event_log: 'calendar-full',
-	time_external: 'calendar-insert',
-	campaign_action: 'campaign-custom',
-	material: 'bag2',
-	materials: 'bag2',
-	schedule: 'calendar-empty',
-
-	// Misc
-	plus: 'linear-plus',
-	circled_plus: 'plus-circle',
-	prohibited: 'prohibited',
-	edit: 'pencil',
-	delete: 'trash',
-	save: 'save',
-	location: 'map-marker',
-	star: 'star',
-	star_filled: 'star-filled',
-	play: 'play-fill',
-	pause: 'pause-fill',
-	clock: 'clock3',
-	timer: 'timer',
-	compose: 'compose',
-	logtime: 'log-time',
-	search: 'magnifier',
-	refresh: 'sync',
-	view: 'magnifier',
-	tick: 'check-bold',
-	cross: 'close-bold',
-	split_task: 'split-task-16px',
-	disable: 'cross',
-	preview: 'magnifier',
-	attachment: 'paperclip',
-	reimbursable: 'email-receipt',
-	// TODO job-upgrade - update non billable with icon found in design, waiting on jack for this one
-	non_billable: 'cross',
-	assigned_to_budget: 'wallet',
-	billing_needed: 'warning',
-	fixed_budget: 'lock',
-	calculated_budget: 'calculator2',
 };
 
 function main () {
