@@ -32,8 +32,6 @@ fn main() {
 
 	mock_data_setup(&mut edges, &mut tables, &mut deployments);
 
-
-
 	let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
 	let mut buf = [0; 100];
 
@@ -41,15 +39,22 @@ fn main() {
 		let (number_of_bytes, src_addr) = socket
 			.recv_from(&mut buf)
 			.expect("Didn't receive data");
-		parse_received(&buf);
 		println!("number_of_bytes : {}\nsrc_addr : {}", number_of_bytes, src_addr);
-		let first_order_links = get_all_links(&mut edges, (20, 10));
-		let benchmark_start = Instant::now();
-		for f in 0 .. first_order_links.len() {
-			let second_order_links = get_all_links(&mut edges, first_order_links[f]);	
-			// println!("number_of_links : {}", second_order_links.len());
-		}
-		println!("benchmark = {} seconds {} nanoseconds", benchmark_start.elapsed().as_secs(), benchmark_start.elapsed().subsec_nanos());
+
+		//TODO send back the data
+		parse_received(&edges, &buf);
+
+
+
+
+
+		// let first_order_links = get_all_links(&mut edges, (20, 10));
+		// let benchmark_start = Instant::now();
+		// for f in 0 .. first_order_links.len() {
+			// let second_order_links = get_all_links(&mut edges, first_order_links[f]);	
+			// // println!("number_of_links : {}", second_order_links.len());
+		// }
+		// println!("benchmark = {} seconds {} nanoseconds", benchmark_start.elapsed().as_secs(), benchmark_start.elapsed().subsec_nanos());
 	}
 }
 
@@ -101,18 +106,37 @@ impl PartialEq for Edge {
 	// id:          u32,
 // }
 
-fn parse_received(buf: & [u8]) -> Option<(String, String, u32)> {
+fn parse_received(edges: &Vec<Edge>, buf: & [u8]) -> Option<(Vec<(u32, u32)>)> {
+
 	let mut temp_string = String::from_utf8_lossy(buf);
 	let mut split = temp_string.split(" ");
+	let mut words : Vec<&str> = Vec::new();
+	
 	for s in split {
+	    words.push(s);
 		println!("{}", s)
+	}
+
+    // String::from(s)
+
+	if words.len() == 0 {
+	    return None;
+	}
+
+
+    // String::from("get_edges")
+    // String::from("get_all_edges")
+	match words[0] {
+	    "get_all_edges"  => return Some( get_all_links(edges, (0, 0)) ),
+	    "get_some_edges" => return None,
+	    _                => return None,
 	}
 	
 	None
 }
 
 fn get_all_links( 
-		edges: &mut Vec<Edge>, 
+		edges: &Vec<Edge>, 
 		(subject_table, subject_id) : (u32, u32) 
 	) -> Vec<(u32, u32)> {
 	
@@ -190,7 +214,7 @@ fn mock_data_setup(
 	let object_range = Range::new(0, 100);
 	let table_range = Range::new(0, 2000);
 
-	let num_of_edges : usize = 10000000;
+	let num_of_edges : usize = 1000000;
 	for e in 0 .. num_of_edges {
 		edges.push( 
 			Edge {
