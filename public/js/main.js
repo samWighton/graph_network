@@ -250,14 +250,19 @@ function draw_edges(){
 			x : vertexes[relationship.to].x,
 			y : vertexes[relationship.to].y,
 		}
-
-		draw_edge(ctx, start, end);
+		var toType = relationship.to.split('_')[0];
+		draw_edge(ctx, start, end, toType);
 	});
 }
 
-function draw_edge(ctx, start, end) {
+function draw_edge(ctx, start, end, toType) {
 	var vertexOffset = 0;
-	ctx.strokeStyle = 'rgba(30,30,30,0.4)';	
+
+	if(toType === 'staff') {
+		ctx.strokeStyle = 'rgba(30,30,30,0.4)';	
+	} else {
+		ctx.strokeStyle = 'rgba(124, 13, 117, 0.4)';	
+	}
 	ctx.lineWidth = 4;
 
 	start.x += global_offset.x - vertexOffset;
