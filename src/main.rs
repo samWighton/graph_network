@@ -235,8 +235,8 @@ fn parse_received(table_names: &mut Vec<&str>, edges: &Vec<Edge>, buf: [u8;100])
             get_all_links(
                 edges, 
                 (
-                    1 as u32,
-                    1065 as u32,
+                    0 as u32,
+                    1104 as u32,
                 )
             ) 
         ),
@@ -252,6 +252,7 @@ fn get_all_links(
 		(subject_type, subject_id) : (u32, u32) 
 	) -> Vec<(Edge)> {
 	
+	println!("length of edges = {}", edges.len());
 	let search_edge = Edge {
 		//deployment:    0,
 		subject_type: subject_type,

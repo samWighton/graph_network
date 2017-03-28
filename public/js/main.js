@@ -110,8 +110,13 @@ function main () {
 		const data = JSON.parse(event.data);
 		if (data.init_data) {
 			objectMetaData = data.init_data;
+		} else if (data.new_data) {
+			console.log(data.new_data);
+			console.log(edges);
+			edges = data.new_data;
 		}
 		set_up_canvas();
+		//update();
 	}
 }
 
